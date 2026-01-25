@@ -10,39 +10,34 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useUser } from '@/context/userContext';
+import EyeClose from "../../assets/images/eye-close.svg"
+import Eye from "@/assets/images/eye.svg";
 
 export default function LoginScreen() {
     const router = useRouter();
+    const  {login} = useUser();
 
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
-    const [errorPhone, setErrorPhone] = useState('');
-    const [errorPass, setErrorPass] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleLogin = () => {
-        setErrorPass('');
-        setErrorPhone('');
+    const isPhoneValid = phone.length === 18;
 
-        if (!phone.trim()) {
-            setErrorPhone('Введите номер телефона');
+    const handleLogin = async () => {
+        setError('');
+
+        if (!phone || !password) {
+            setError('Заполните номер телефона и пароль');
             return;
         }
-
-        if (phone.length < 17 ) {
-            setErrorPhone('Введите корректный номер телефона');
-            return;
+        const success = await login(phone, password);
+        if (success) {
+            router.replace('/(tabs)/home');
+        } else {
+            setError('Неверный номер телефона или пароль');
         }
-
-        if (!password.trim()) {
-            setErrorPass('Введите пароль');
-            return;
-        }
-
-        if (password.length < 6) {
-            setErrorPass('Пароль должен быть не короче 6 символов');
-            return;
-        }
-        router.replace('/(tabs)/home');
     };
 
     const handleReg =() => {
@@ -92,33 +87,37 @@ export default function LoginScreen() {
                                 />
                             </View>
 
-                            {errorPhone ? <Text style={styles.errorText}>{errorPhone}</Text> : null}
-
                             <View style={styles.inputWrapper}>
                                 <Text style={styles.label}>Пароль</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="••••••••"
-                                    placeholderTextColor="#A9A9A9"
-                                    secureTextEntry
-                                    value={password}
-                                    onChangeText={setPassword}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                />
+                                <View style={styles.inputWithIcon}>
+                                    <TextInput
+                                        style={styles.input}
+                                        secureTextEntry={!showPassword}
+                                        value={password}
+                                        onChangeText={setPassword}
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                        keyboardType="default"
+                                        contextMenuHidden={true}
+                                    />
+                                    <TouchableOpacity
+                                        onPress={()=> setShowPassword(!showPassword)} style={styles.eyeButton}
+                                    >
+                                        {showPassword ? <EyeClose width={22} height={22}/> : <Eye width={22} height={22} />}
+                                    </TouchableOpacity>
+                                </View>
                             </View>
 
-                            {errorPass ? <Text style={styles.errorText}>{errorPass}</Text> : null}
-
-                            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                                <Text style={styles.buttonText}>Войти</Text>
-                            </TouchableOpacity>
+                            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
                             <TouchableOpacity
-                                style={styles.forgotPassword}
-                                onPress={() => router.push('/(auth)/forgot-password')}
-                            >
-                                <Text style={styles.linkText}>Забыли пароль?</Text>
+                                style={[
+                                    styles.button,
+                                    (!isPhoneValid || !password) && { opacity: 0.6 },
+                                ]}
+                                disabled={!isPhoneValid || !password}
+                                onPress={handleLogin}>
+                                <Text style={styles.buttonText}>Войти</Text>
                             </TouchableOpacity>
                         </View>
                     </>
@@ -127,9 +126,9 @@ export default function LoginScreen() {
             <View style={styles.footer}>
 
                 <Text style={styles.footerText}>Нет аккаунта? </Text>
-                    <TouchableOpacity onPress={handleReg}>
-                        <Text style={styles.registerLink}>Зарегистрироваться</Text>
-                    </TouchableOpacity>
+                <TouchableOpacity onPress={handleReg}>
+                    <Text style={styles.registerLink}>Зарегистрироваться</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -225,5 +224,16 @@ const styles = StyleSheet.create({
         color: '#4F903F',
         fontFamily:'Roboto-Bold',
         fontSize: 15,
+    },
+    inputWithIcon: {
+        position: 'relative',
+        justifyContent: 'center'
+    },
+    eyeButton: {
+        position: 'absolute',
+        right: 10,
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

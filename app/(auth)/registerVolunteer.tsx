@@ -15,15 +15,22 @@ import { Picker } from '@react-native-picker/picker';
 import Eye from "../../assets/images/eye.svg"
 import EyeClose from "../../assets/images/eye-close.svg"
 import ReturnIcon from "@/assets/images/return.svg";
+import {useUser} from "@/context/userContext";
+import { getAge } from '@/utils/getAge';
+import DateTimePicker, {DateTimePickerEvent} from '@react-native-community/datetimepicker';
 
-export default function RegisterCoordinator() {
+
+export default function RegisterVolunteer() {
+    const {register} = useUser();
+
     const router = useRouter();
 
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [passwordRepeat, setPasswordRepeat] = useState('');
     const [name, setName] = useState('');
-    const [age, setAge] = useState('');
+    const [birthDate, setBirthDate] = useState<Date | null>(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
     const [employmentStatus, setEmploymentStatus] = useState('');
@@ -39,18 +46,17 @@ export default function RegisterCoordinator() {
     const phoneError =
         phone === ''
             ? 'Введите номер телефона'
-            : phone.length < 17
+            : phone.length !== 18
                 ? 'Введите корректный номер телефона'
                 : '';
 
     const nameError = name === '' ? 'Введите имя' : '';
 
-    const ageError =
-        age === ''
-            ? 'Введите возраст'
-            : Number(age) < 13 || Number(age) > 100
-                ? 'Возраст должен быть от 13 до 100 лет'
-                : '';
+    const birthDateError = !birthDate
+        ? 'Выберите дату рождения'
+        : getAge(birthDate.toISOString()) < 13
+            ? 'Регистрация доступна с 13 лет'
+            : '';
 
     const employmentError =
         employmentStatus === '' ? 'Выберите статус занятости' : '';
@@ -68,15 +74,40 @@ export default function RegisterCoordinator() {
         !!(
             phoneError ||
             nameError ||
-            ageError ||
+            birthDateError ||
             employmentError ||
             passwordError
         );
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         setSubmitted(true);
         if (hasErrors) return;
-        router.replace('/(tabs)/home');
+        const newUser ={
+            id: Date.now(),
+            name,
+            phone,
+            password,
+            birthDate: birthDate!.toISOString(),
+            employmentStatus,
+            school: employmentStatus === 'student_school'
+                ? (school === 'custom' ? customSchool : school)
+                : undefined,
+            university: employmentStatus === 'student_university'
+                ? (university === 'custom' ? customUniversity : university)
+                : undefined,
+            workPlace: employmentStatus === 'working'
+                ? workPlace
+                : undefined,
+            role: 'volunteer' as const,
+        };
+
+        const success = await register(newUser);
+
+        if(success) {
+            router.replace('/(tabs)/home');
+        } else{
+            alert('Пользователь с таким номером уже зарегистрирован')
+        }
     };
 
     const formatPhone = (text: string) => {
@@ -151,22 +182,38 @@ export default function RegisterCoordinator() {
                     </View>
 
                     <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Ваш возраст*</Text>
-                        <TextInput
+                        <Text style={styles.label}>Дата рождения*</Text>
+
+                        <TouchableOpacity
                             style={styles.input}
-                            placeholder="18"
-                            value={age}
-                            onChangeText={(text) =>
-                                setAge(text.replace(/[^0-9]/g, ''))
-                            }
-                            keyboardType="number-pad"
-                            maxLength={3}
-                            selectTextOnFocus
-                        />
-                        {submitted && ageError !== '' && (
-                            <Text style={styles.errorText}>{ageError}</Text>
+                            onPress={() => setShowDatePicker(true)}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={{ color: birthDate ? '#000' : '#999', fontSize: 16 }}>
+                                {birthDate
+                                    ? birthDate.toLocaleDateString('ru-RU')
+                                    : 'Выберите дату'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {submitted && !birthDate && (
+                            <Text style={styles.errorText}>Выберите дату рождения</Text>
                         )}
                     </View>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={birthDate ?? new Date(2005, 0, 1)}
+                            mode="date"
+                            display="spinner"
+                            maximumDate={new Date()}
+                            onChange={(event: DateTimePickerEvent, date?: Date) => {
+                                setShowDatePicker(false);
+                                if (date) setBirthDate(date);
+                            }}
+                        />
+                    )}
+
 
                     <View style={styles.inputWrapper}>
                         <Text style={styles.label}>Статус занятости*</Text>

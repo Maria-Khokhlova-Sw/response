@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#4F903F",
-        "foregroundImage": "./assets/images/iconCoor.png",
+        "foregroundImage": "./assets/images/iconCoor.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -35,7 +35,8 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -9,6 +9,7 @@ import {
     Platform,
     ScrollView,
 } from 'react-native';
+import {useUser} from '@/context/userContext'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Eye from "../../assets/images/eye.svg"
@@ -16,6 +17,8 @@ import EyeClose from "../../assets/images/eye-close.svg"
 import ReturnIcon from "@/assets/images/return.svg";
 
 export default function RegisterCoordinator() {
+    const {register} = useUser();
+
     const router = useRouter();
 
     const [phone, setPhone] = useState('');
@@ -32,7 +35,7 @@ export default function RegisterCoordinator() {
     const phoneError =
         phone === ''
             ? 'Введите номер телефона'
-            : phone.length < 17
+            : phone.length !== 18
                 ? 'Введите корректный номер телефона'
                 : '';
 
@@ -58,10 +61,28 @@ export default function RegisterCoordinator() {
             passwordError
         );
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         setSubmitted(true);
-        if (hasErrors) return;
-        router.replace('/(tabs)/home');
+        if(hasErrors) {
+            return;
+        }
+        const newUser ={
+            id: Date.now(),
+            name,
+            phone,
+            password,
+            workPlace: job,
+            post,
+            role: 'coordinator' as const,
+        };
+
+        const success = await register(newUser);
+
+        if(success) {
+            router.replace('/(tabs)/home');
+        } else{
+            alert('Пользователь с таким номером уже зарегистрирован')
+        }
     };
 
     const formatPhone = (text: string) => {
