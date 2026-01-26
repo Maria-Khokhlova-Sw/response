@@ -1,12 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { useUser} from "@/context/userContext";
 
 export default function Home() {
     const router = useRouter();
+    const { user, logout } = useUser();
 
-    const handleLogout = () => {
-        // Можно здесь чистить контекст пользователя, токены и т.д.
-        router.replace('/(auth)/login'); // Переход на экран входа
+    const handleLogout = async () => {
+        await logout();
+        router.replace('/(auth)/login');
+    };
+    const handleProfile = async () => {
+        router.replace('/(tabs)/profile');
     };
 
     return (

@@ -460,5 +460,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         fontSize: 16,
         marginTop: 16,
-    }
+    },
+    photo:{
+        width: 300,
+        height: 300,
+        marginTop: 10,
+        marginBottom:15,
+    },
 });
