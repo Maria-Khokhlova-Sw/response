@@ -4,17 +4,17 @@ import { useUser } from '@/context/userContext';
 import { useRouter } from 'expo-router';
 
 export default function LoadingScreen() {
-    const { user } = useUser();
+    const { currentUser } = useUser();
     const router = useRouter();
 
     useEffect(() => {
-        if (user) {
+        if (currentUser) {
             router.replace('/(tabs)/home');
         }
-    }, [user]);
+    }, [currentUser]);
 
     const handlePress = () => {
-        if (!user) {
+        if (!currentUser) {
             router.replace('/(auth)/login');
         }
     };
@@ -45,7 +45,7 @@ export default function LoadingScreen() {
                 >
                     добро пожаловать в&nbsp;Отлик!
                 </Text>
-                {!user && (
+                {!currentUser && (
                     <Text style={{ position: 'absolute', bottom: 60, color: 'white' }}>
                         нажмите, чтобы продолжить
                     </Text>

@@ -16,7 +16,7 @@ import Eye from "@/assets/images/eye.svg";
 
 export default function LoginScreen() {
     const router = useRouter();
-    const  {login} = useUser();
+    const login = useUser(state => state.login);
 
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');

@@ -21,7 +21,7 @@ import DateTimePicker, {DateTimePickerEvent} from '@react-native-community/datet
 
 
 export default function RegisterVolunteer() {
-    const {register} = useUser();
+    const register = useUser(state => state.register);
 
     const router = useRouter();
 

@@ -17,7 +17,7 @@ import EyeClose from "../../assets/images/eye-close.svg"
 import ReturnIcon from "@/assets/images/return.svg";
 
 export default function RegisterCoordinator() {
-    const {register} = useUser();
+    const register = useUser(state => state.register);
 
     const router = useRouter();
 

@@ -4,11 +4,9 @@ import { useUser} from "@/context/userContext";
 
 export default function Profile() {
     const router = useRouter();
-    const { user, logout } = useUser();
+    const {currentUser, logout } = useUser();
 
-    if (!user) return null;
-
-    console.log(user)
+    if (!currentUser) return null;
 
 
     const handleLogout = async () => {
@@ -26,10 +24,19 @@ export default function Profile() {
                 />
             </View>
 
-            <Text style={styles.name}>{user.name}</Text>
-            <Text style={styles.info}>{user.phone}</Text>
-            {user.birthDate && (
-                <Text style={styles.info}>Дата рождения: {user.birthDate}</Text>
+            <Text style={styles.name}>{currentUser.name}</Text>
+            <Text style={styles.info}>{currentUser.phone}</Text>
+            {currentUser.role && (
+                <Text style={styles.info}>Дата рождения: {currentUser.role}</Text>
+            )}
+            {currentUser.birthDate && (
+                <Text style={styles.info}>Дата рождения: {currentUser.birthDate}</Text>
+            )}
+            {currentUser.post && (
+                <Text style={styles.info}>Дата рождения: {currentUser.post}</Text>
+            )}
+            {currentUser.employmentStatus && (
+                <Text style={styles.info}>Дата рождения: {currentUser.employmentStatus}</Text>
             )}
 
             <TouchableOpacity
@@ -45,6 +52,7 @@ export default function Profile() {
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
