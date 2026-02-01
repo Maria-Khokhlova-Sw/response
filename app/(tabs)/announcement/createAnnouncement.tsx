@@ -1,10 +1,10 @@
-import { useAnnouncements } from '@/context/announcementsContext';
-import { useUser } from '@/context/userContext';
+import { useAnnouncements } from '@/stores/announcementsStores';
+import { useUserStore } from '@/stores/userStores';
 import {useState} from "react";
 import {Button, TextInput, View} from "react-native";
 
-function CreateAnnouncementForm() {
-    const { currentUser } = useUser();
+export default function CreateAnnouncementForm() {
+    const { currentUser } = useUserStore();
     const addAnnouncement = useAnnouncements(s => s.addAnnouncement);
 
     const [title, setTitle] = useState('');

@@ -1,10 +1,10 @@
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import { useRouter } from 'expo-router';
-import { useUser} from "@/context/userContext";
+import { useUserStore} from "@/stores/userStores";
+import {formateDate} from "@/utils/formateDate";
 
-export default function Profile() {
-    const router = useRouter();
-    const {currentUser, logout } = useUser();
+export default function Profile() {    const router = useRouter();
+    const {currentUser, logout } = useUserStore();
 
     if (!currentUser) return null;
 
@@ -27,16 +27,16 @@ export default function Profile() {
             <Text style={styles.name}>{currentUser.name}</Text>
             <Text style={styles.info}>{currentUser.phone}</Text>
             {currentUser.role && (
-                <Text style={styles.info}>Дата рождения: {currentUser.role}</Text>
+                <Text style={styles.info}>Ваша роль: {currentUser.role}</Text>
             )}
             {currentUser.birthDate && (
-                <Text style={styles.info}>Дата рождения: {currentUser.birthDate}</Text>
+                <Text style={styles.info}>Дата рождения: {formateDate(currentUser.birthDate)}</Text>
             )}
             {currentUser.post && (
-                <Text style={styles.info}>Дата рождения: {currentUser.post}</Text>
+                <Text style={styles.info}>Должность: {currentUser.post}</Text>
             )}
             {currentUser.employmentStatus && (
-                <Text style={styles.info}>Дата рождения: {currentUser.employmentStatus}</Text>
+                <Text style={styles.info}>Род деятельности: {currentUser.employmentStatus}</Text>
             )}
 
             <TouchableOpacity
@@ -51,6 +51,7 @@ export default function Profile() {
             </TouchableOpacity>
         </View>
     );
+
 }
 
 const styles = StyleSheet.create({

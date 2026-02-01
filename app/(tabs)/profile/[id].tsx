@@ -1,13 +1,13 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useUser } from '@/context/userContext';
+import { useUserStore } from '@/stores/userStores';
 
 export default function Profile() {
     const router = useRouter();
     const { id } = useLocalSearchParams<{ id: string }>();
-    const currentUser = useUser((state) => state.currentUser);
-    const getUserById = useUser((state) => state.getUserById);
-    const logout = useUser((state) => state.logout);
+    const currentUser = useUserStore((state) => state.currentUser);
+    const getUserById = useUserStore((state) => state.getUserById);
+    const logout = useUserStore((state) => state.logout);
 
     if (!currentUser) return null;
 

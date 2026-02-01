@@ -1,21 +1,20 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useUser } from '@/context/userContext';
-import { useAnnouncements} from '@/context/announcementsContext';
+import { useUserStore } from '@/stores/userStores';
+import { useAnnouncements} from '@/stores/announcementsStores';
 import Profile from '@/assets/images/profile.svg';
 import {goToAnnouncement, goToProfile} from "@/utils/navigation";
 
 export default function Home() {
     const router = useRouter();
 
-    const { currentUser, logout } = useUser();
+    const { currentUser, logout } = useUserStore();
     const { announcements } = useAnnouncements();
 
     const handleLogout = async () => {
         await logout();
         router.replace('/(auth)/login');
     };
-
 
     return (
         <View style={styles.container}>

@@ -32,7 +32,7 @@ export const initialCoordinators: User[] = [
 
 export const initialVolunteers: User[] = [
     {
-        id: 1,
+        id: 4,
         name: "Алексей Максимович Смирнов",
         phone: "+7 (901) 234-56-78",
         password: "Volunteer1",
@@ -42,7 +42,7 @@ export const initialVolunteers: User[] = [
         role: 'volunteer',
     },
     {
-        id: 2,
+        id: 5,
         name: "Мария Сергеевна Кузнецова",
         phone: "+7 (905) 678-90-12",
         password: "MariaV123",
@@ -52,7 +52,7 @@ export const initialVolunteers: User[] = [
         role: 'volunteer',
     },
     {
-        id: 3,
+        id: 6,
         name: "Дмитрий Александрович Орлов",
         phone: "+7 (912) 111-22-33",
         password: "Dmitry01",
@@ -62,7 +62,8 @@ export const initialVolunteers: User[] = [
         role: 'volunteer',
     },
     {
-        id: 4,
+
+        id: 7,
         name: "Елена Васильевна Васильева",
         phone: "+7 (913) 444-55-66",
         password: "ElenaV123",

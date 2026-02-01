@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useUser } from '@/context/userContext';
+import { useUserStore } from '@/stores/userStores';
 import EyeClose from "../../assets/images/eye-close.svg"
 import Eye from "@/assets/images/eye.svg";
 
 export default function LoginScreen() {
     const router = useRouter();
-    const login = useUser(state => state.login);
+    const login = useUserStore(state => state.login);
 
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');

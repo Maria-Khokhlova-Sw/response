@@ -9,7 +9,7 @@ import {
     Platform,
     ScrollView,
 } from 'react-native';
-import {useUser} from '@/context/userContext'
+import { useUserStore } from '@/stores/userStores'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Eye from "../../assets/images/eye.svg"
@@ -17,7 +17,7 @@ import EyeClose from "../../assets/images/eye-close.svg"
 import ReturnIcon from "@/assets/images/return.svg";
 
 export default function RegisterCoordinator() {
-    const register = useUser(state => state.register);
+    const register = useUserStore(state => state.register);
 
     const router = useRouter();
 
