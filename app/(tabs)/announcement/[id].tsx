@@ -12,6 +12,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAnnouncements } from '@/stores/announcementsStores';
 import { useUserStore } from '@/stores/userStores';
+import ReturnIcon from "@/assets/images/return.svg";
+import {goToProfile} from "@/utils/navigation";
 
 export default function AnnouncementDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -41,8 +43,15 @@ export default function AnnouncementDetail() {
         );
     }
 
+    const isPending = announcement.pendingParticipants.includes(currentUser?.id ?? 0);
     const isParticipating = announcement.participants.includes(currentUser?.id ?? 0);
-    const isCoordinator = currentUser?.id === announcement.coordinatorId;
+    const isParticipationDisabled = isPending || sendingComment;
+
+    const participationButtonText = isPending
+        ? 'Заявка отправлена'
+        : isParticipating
+            ? 'Отказаться от участия'
+            : 'Откликнуться';
 
     const handleToggleParticipation = () => {
         if (!currentUser) {
@@ -52,6 +61,11 @@ export default function AnnouncementDetail() {
 
         if (currentUser.role !== 'volunteer') {
             Alert.alert('Только волонтёры', 'Координаторы не могут участвовать');
+            return;
+        }
+
+        if (isPending) {
+            Alert.alert('Заявка уже отправлена', 'Ожидайте решения координатора');
             return;
         }
 
@@ -74,7 +88,7 @@ export default function AnnouncementDetail() {
                 currentUser.id
             );
             setCommentText('');
-        } catch (err) {
+        } catch (error) {
             Alert.alert('Ошибка', 'Не удалось отправить комментарий');
         } finally {
             setSendingComment(false);
@@ -83,12 +97,21 @@ export default function AnnouncementDetail() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+            <TouchableOpacity style={styles.returnBlock} onPress={() => router.back()}>
+                <ReturnIcon width={30} height={30} />
+                <Text style={styles.return}>Назад</Text>
+            </TouchableOpacity>
+
             <Text style={styles.title}>{announcement.title}</Text>
 
             <View style={styles.metaRow}>
-                <Text style={styles.meta}>
-                    Координатор: {announcement.coordinator}
-                </Text>
+                <TouchableOpacity
+                    onPress={() => goToProfile(router, announcement.coordinatorId)}
+                    activeOpacity={0.7}>
+                    <Text style={styles.meta}>
+                        Координатор: {announcement.coordinator}
+                    </Text>
+                </TouchableOpacity>
                 <Text style={styles.meta}>
                     Действует до: {announcement.validUntil}
                 </Text>
@@ -117,16 +140,16 @@ export default function AnnouncementDetail() {
                     style={[
                         styles.participationButton,
                         isParticipating ? styles.participationButtonActive : null,
+                        isParticipationDisabled && styles.participationButtonDisabled,
                     ]}
                     onPress={handleToggleParticipation}
+                    disabled={isParticipationDisabled}
                 >
                     <Text style={styles.participationButtonText}>
-                        {isParticipating ? 'Отказаться от участия' : 'Присоединиться'}
+                        {participationButtonText}
                     </Text>
                 </TouchableOpacity>
             )}
-
-            {/* Комментарии */}
             <Text style={styles.sectionTitle}>Комментарии ({announcement.comments.length})</Text>
 
             {announcement.comments.length === 0 ? (
@@ -182,27 +205,33 @@ export default function AnnouncementDetail() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#fff' },
-    content: { padding: 20, paddingBottom: 100 },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff'
+    },
+    content: {
+        padding: 20,
+        paddingBottom: 100
+    },
     centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
     },
-
     title: {
+        marginTop: 70,
         fontSize: 24,
         fontFamily: 'Roboto-Bold',
         color: '#333',
         marginBottom: 12,
     },
     metaRow: {
-        flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 12,
     },
     meta: {
+        marginBottom: 5,
         fontSize: 14,
         color: '#666',
     },
@@ -214,11 +243,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#E8F5E9',
         marginBottom: 20,
     },
-    statusText: { fontSize: 14, fontWeight: '600' },
-    statusActive: { color: '#4CAF50' },
-    statusDone: { color: '#2196F3' },
-    statusArchive: { color: '#757575' },
-
+    statusText: {
+        fontSize: 14,
+        fontWeight: '600'
+    },
+    statusActive: {
+        color: '#4F903F'
+    },
+    statusDone: {
+        color: '#2196F3'
+    },
+    statusArchive: {
+        color: '#757575'
+    },
     sectionTitle: {
         fontSize: 18,
         fontFamily: 'Roboto-Medium',
@@ -231,7 +268,6 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         color: '#444',
     },
-
     participationButton: {
         marginVertical: 20,
         paddingVertical: 14,
@@ -247,7 +283,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'Roboto-Medium',
     },
-
     commentItem: {
         backgroundColor: '#F9F9F9',
         padding: 14,
@@ -271,7 +306,6 @@ const styles = StyleSheet.create({
     },
     noComments: {
         fontSize: 15,
-        color: '#999',
         textAlign: 'center',
         marginVertical: 20,
     },
@@ -285,7 +319,6 @@ const styles = StyleSheet.create({
         flex: 1,
         minHeight: 48,
         maxHeight: 120,
-        backgroundColor: '#F9F9F9',
         borderWidth: 1,
         borderColor: '#DDD',
         borderRadius: 12,
@@ -300,14 +333,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#4F903F',
         paddingHorizontal: 16,
         paddingVertical: 8,
-        borderRadius: 20,
+        borderRadius: 10,
     },
     sendButtonText: {
         color: '#fff',
         fontSize: 14,
         fontFamily: 'Roboto-Medium',
     },
-
     errorText: {
         fontSize: 18,
         color: '#D32F2F',
@@ -323,5 +355,22 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontFamily: 'Roboto-Medium',
+    },
+    returnBlock: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        zIndex: 10,
+    },
+    return: {
+        color: '#4F903F',
+        fontSize: 20,
+        fontFamily: 'Roboto-Bold',
+        marginLeft: 8,
+    },
+    participationButtonDisabled: {
+        opacity: 0.5,
     },
 });

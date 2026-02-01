@@ -14,9 +14,11 @@ export interface Announcement {
     coordinatorId: number;
     createdAt: string;
     validUntil: string;
-    status: 'Активно' | 'Архив' | 'Черновик' | 'Выполнено';
+    status: 'Активно' | 'Архив' | 'Выполнено';
     comments: Comment[];
     participants: number[];
+    pendingParticipants: number[];
+    rejectedParticipants: number[];
 }
 
 export interface AnnouncementsStore {
@@ -33,5 +35,18 @@ export interface AnnouncementsStore {
         authorId?: number
     ) => void;
 
-    toggleParticipation: (announcementId: number, volunteerId: number) => void;
+    toggleParticipation: (
+        announcementId: number,
+        volunteerId: number
+    ) => void;
+
+    approveParticipation: (
+        announcementId: number,
+        volunteerId: number
+    ) => void;
+
+    rejectParticipation: (
+        announcementId: number,
+        volunteerId: number
+    ) => void;
 }

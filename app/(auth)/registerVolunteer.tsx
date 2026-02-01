@@ -8,6 +8,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -42,6 +43,8 @@ export default function RegisterVolunteer() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordRepeat, setShowPasswordRepeat] = useState(false);
+
+    const [agreed, setAgreed] = useState(false);
 
     const phoneError =
         phone === ''
@@ -78,6 +81,27 @@ export default function RegisterVolunteer() {
             employmentError ||
             passwordError
         );
+
+    const showConsentAlert = () => {
+        Alert.alert(
+            "Согласие на обработку персональных данных",
+            `Настоящим Я даю своё согласие Организации (далее — Оператор) на обработку моих персональных данных, а именно: ФИО, номер телефона, дата рождения, статус занятости, место учёбы/работы, адрес электронной почты (если будет указан позже) и иные данные, предоставленные мной при регистрации и использовании приложения.
+        Цели обработки:
+        • регистрация и идентификация в мобильном приложении;
+        • организация волонтёрской деятельности, направление на мероприятия;
+        • информирование о событиях, акциях, обучении, возможностях для волонтёров и координаторов;
+        • ведение реестра волонтёров и координаторов;
+        • учёт часов волонтёрской деятельности;
+        • направление благодарностей, сертификатов, рекомендаций;
+        • соблюдение требований законодательства РФ о волонтёрской деятельности.
+        Обработка включает сбор, запись, систематизацию, накопление, хранение, уточнение, извлечение, использование, передачу (в т.ч. трансграничную), обезличивание, блокирование, удаление, уничтожение.
+        Согласие действует с момента регистрации до момента отзыва. Отзыв согласия влечёт невозможность дальнейшего использования аккаунта.
+        Я осведомлён(а), что могу отозвать согласие, направив письменное заявление Оператору.
+        Подтверждаю, что ознакомлен(а) с текстом согласия и даю его добровольно.`,
+        );
+    };
+
+    const isButtonDisabled = !agreed || (submitted && hasErrors);
 
     const handleRegister = async () => {
         setSubmitted(true);
@@ -189,7 +213,7 @@ export default function RegisterVolunteer() {
                             onPress={() => setShowDatePicker(true)}
                             activeOpacity={0.7}
                         >
-                            <Text style={{ color: birthDate ? '#000' : '#999', fontSize: 16 }}>
+                            <Text style={{ color: birthDate ? '#000' : '#999', fontSize: 16, paddingTop: 13 }}>
                                 {birthDate
                                     ? birthDate.toLocaleDateString('ru-RU')
                                     : 'Выберите дату'}
@@ -203,7 +227,7 @@ export default function RegisterVolunteer() {
 
                     {showDatePicker && (
                         <DateTimePicker
-                            value={birthDate ?? new Date(2005, 0, 1)}
+                            value={birthDate ?? new Date(2000, 0, 1)}
                             mode="date"
                             display="spinner"
                             maximumDate={new Date()}
@@ -346,9 +370,34 @@ export default function RegisterVolunteer() {
                         )}
                     </View>
                     <TouchableOpacity
-                        style={[styles.button, submitted && hasErrors && styles.buttonDisabled]}
+                        style={styles.consentRow}
+                        onPress={() => setAgreed(!agreed)}
+                        activeOpacity={0.7}
+                    >
+                        <View style={[styles.checkbox, agreed && styles.checkboxActive]}>
+                            {agreed && <Text style={styles.checkmark}>✓</Text>}
+                        </View>
+                        <Text style={styles.consentText}>
+                            Я согласен(а) с{' '}
+                            <Text
+                                style={styles.consentLink}
+                                onPress={showConsentAlert}
+                            >
+                                обработкой персональных данных
+                            </Text>
+                        </Text>
+                    </TouchableOpacity>
+
+                    {submitted && !agreed && (
+                        <Text style={styles.errorText}>
+                            Необходимо дать согласие на обработку персональных данных
+                        </Text>
+                    )}
+
+                    <TouchableOpacity
+                        style={[styles.button, isButtonDisabled && styles.buttonDisabled]}
                         onPress={handleRegister}
-                        disabled={submitted && hasErrors}
+                        disabled={isButtonDisabled}
                     >
                         <Text style={styles.buttonText}>
                             Зарегистрироваться
@@ -444,7 +493,7 @@ const styles = StyleSheet.create({
     },
     returnBlock:{
         position: 'absolute',
-        top: 30,
+        top: 20,
         left: 20,
         display: 'flex',
         flexDirection: 'row',
@@ -460,11 +509,40 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         fontSize: 16,
         marginTop: 16,
+        paddingTop: 16,
     },
-    photo:{
-        width: 300,
-        height: 300,
+    consentRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
         marginTop: 10,
-        marginBottom:15,
+        marginBottom: 16,
+    },
+    checkbox: {
+        width: 20,
+        height: 20,
+        borderWidth: 2,
+        borderColor: '#DDDDDD',
+        borderRadius: 4,
+        marginRight: 12,
+        alignItems: 'center',
+    },
+    checkboxActive: {
+        borderColor: '#4F903F',
+        backgroundColor: '#4F903F',
+    },
+    checkmark: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    consentText: {
+        flex: 1,
+        fontSize: 14,
+        color: '#333333',
+        lineHeight: 20,
+    },
+    consentLink: {
+        color: '#4F903F',
+        textDecorationLine: 'underline',
     },
 });

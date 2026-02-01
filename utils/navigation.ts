@@ -13,3 +13,9 @@ export function goToAnnouncement(router: Router, announcementId: number | string
         params: { id: String(announcementId) },
     });
 }
+export function goCreateAnnouncement(router: Router, announcementId: number | string) {
+    router.push({
+        pathname: '/announcement/createAnnouncement',
+        params: { id: String(announcementId) },
+    });
+}

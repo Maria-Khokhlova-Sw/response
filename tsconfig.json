@@ -5,7 +5,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "lib": [
+      "DOM",
+      "ESNext"
+    ]
   },
   "include": [
     "**/*.ts",

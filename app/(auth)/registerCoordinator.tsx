@@ -8,6 +8,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Alert,
 } from 'react-native';
 import { useUserStore } from '@/stores/userStores'
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,6 +32,8 @@ export default function RegisterCoordinator() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordRepeat, setShowPasswordRepeat] = useState(false);
+
+    const [agreed, setAgreed] = useState(false);
 
     const phoneError =
         phone === ''
@@ -102,6 +105,27 @@ export default function RegisterCoordinator() {
     const handleFork= () =>{
         router.push('/(auth)/fork');
     }
+
+    const showConsentAlert = () => {
+        Alert.alert(
+            "Согласие на обработку персональных данных",
+            `Настоящим Я даю своё согласие Организации (далее — Оператор) на обработку моих персональных данных, а именно: ФИО, номер телефона, дата рождения, статус занятости, место учёбы/работы, адрес электронной почты (если будет указан позже) и иные данные, предоставленные мной при регистрации и использовании приложения.
+        Цели обработки:
+        • регистрация и идентификация в мобильном приложении;
+        • организация волонтёрской деятельности, направление на мероприятия;
+        • информирование о событиях, акциях, обучении, возможностях для волонтёров и координаторов;
+        • ведение реестра волонтёров и координаторов;
+        • учёт часов волонтёрской деятельности;
+        • направление благодарностей, сертификатов, рекомендаций;
+        • соблюдение требований законодательства РФ о волонтёрской деятельности.
+        Обработка включает сбор, запись, систематизацию, накопление, хранение, уточнение, извлечение, использование, передачу (в т.ч. трансграничную), обезличивание, блокирование, удаление, уничтожение.
+        Согласие действует с момента регистрации до момента отзыва. Отзыв согласия влечёт невозможность дальнейшего использования аккаунта.
+        Я осведомлён(а), что могу отозвать согласие, направив письменное заявление Оператору.
+        Подтверждаю, что ознакомлен(а) с текстом согласия и даю его добровольно.`,
+        );
+    };
+
+    const isButtonDisabled = !agreed || (submitted && hasErrors);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -195,7 +219,8 @@ export default function RegisterCoordinator() {
                                 contextMenuHidden={true}
                             />
                             <TouchableOpacity
-                                onPress={()=> setShowPassword(!showPassword)} style={styles.eyeButton}
+                                onPress={()=> setShowPassword(!showPassword)}
+                                style={styles.eyeButton}
                             >
                                 {showPassword ? <EyeClose width={22} height={22}/> : <Eye width={22} height={22} />}
                             </TouchableOpacity>
@@ -226,11 +251,35 @@ export default function RegisterCoordinator() {
                             <Text style={styles.errorText}>{passwordError}</Text>
                         )}
                     </View>
+                    <TouchableOpacity
+                        style={styles.consentRow}
+                        onPress={() => setAgreed(!agreed)}
+                        activeOpacity={0.7}
+                    >
+                        <View style={[styles.checkbox, agreed && styles.checkboxActive]}>
+                            {agreed && <Text style={styles.checkmark}>✓</Text>}
+                        </View>
+                        <Text style={styles.consentText}>
+                            Я согласен(а) с{' '}
+                            <Text
+                                style={styles.consentLink}
+                                onPress={showConsentAlert}
+                            >
+                                обработкой персональных данных
+                            </Text>
+                        </Text>
+                    </TouchableOpacity>
+
+                    {submitted && !agreed && (
+                        <Text style={styles.errorText}>
+                            Необходимо дать согласие на обработку персональных данных
+                        </Text>
+                    )}
 
                     <TouchableOpacity
-                        style={[styles.button, submitted && hasErrors && styles.buttonDisabled]}
+                        style={[styles.button, isButtonDisabled && styles.buttonDisabled]}
                         onPress={handleRegister}
-                        disabled={submitted && hasErrors}
+                        disabled={isButtonDisabled}
                     >
                         <Text style={styles.buttonText}>
                             Зарегистрироваться
@@ -256,6 +305,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     title: {
+        marginTop: 60,
         fontSize: 32,
         fontFamily: 'Roboto-Bold',
         color: '#333333',
@@ -318,11 +368,45 @@ const styles = StyleSheet.create({
     },
     returnBlock:{
         position: 'absolute',
-        top: 30,
+        top: 20,
         left: 20,
         display: 'flex',
         flexDirection: 'row',
         gap: 10,
         alignItems: 'center',
-    }
+    },
+    consentRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginTop: 10,
+        marginBottom: 16,
+    },
+    checkbox: {
+        width: 20,
+        height: 20,
+        borderWidth: 2,
+        borderColor: '#DDDDDD',
+        borderRadius: 4,
+        marginRight: 12,
+        alignItems: 'center',
+    },
+    checkboxActive: {
+        borderColor: '#4F903F',
+        backgroundColor: '#4F903F',
+    },
+    checkmark: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    consentText: {
+        flex: 1,
+        fontSize: 14,
+        color: '#333333',
+        lineHeight: 20,
+    },
+    consentLink: {
+        color: '#4F903F',
+        textDecorationLine: 'underline',
+    },
 });

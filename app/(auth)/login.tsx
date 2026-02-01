@@ -8,10 +8,10 @@ import {
     KeyboardAvoidingView,
     Platform,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useUserStore } from '@/stores/userStores';
-import EyeClose from "../../assets/images/eye-close.svg"
+import EyeClose from "../../assets/images/eye-close.svg";
 import Eye from "@/assets/images/eye.svg";
 
 export default function LoginScreen() {
@@ -40,9 +40,9 @@ export default function LoginScreen() {
         }
     };
 
-    const handleReg =() => {
+    const handleReg = () => {
         router.push('/(auth)/fork');
-    }
+    };
 
     const formatPhone = (text: string) => {
         let cleaned = text.replace(/\D/g, '');
@@ -65,68 +65,68 @@ export default function LoginScreen() {
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
             >
                 <View style={styles.content}>
-                    <>
-                        <Text style={styles.title}>Вход в Отклик</Text>
-                        <Text style={styles.subtitle}>
-                            Введите номер телефона и пароль
-                        </Text>
+                    <Text style={styles.title}>Вход в Отклик</Text>
+                    <Text style={styles.subtitle}>
+                        Введите номер телефона и пароль
+                    </Text>
 
-                        <View style={styles.form}>
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Номер телефона</Text>
+                    <View style={styles.form}>
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Номер телефона</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="+7 (___) ___-__-__"
+                                placeholderTextColor="#A9A9A9"
+                                keyboardType="phone-pad"
+                                value={phone}
+                                onChangeText={(text) => setPhone(formatPhone(text))}
+                                maxLength={18}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                            />
+                        </View>
+
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Пароль</Text>
+                            <View style={styles.inputWithIcon}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="+7 (___) ___-__-__"
-                                    placeholderTextColor="#A9A9A9"
-                                    keyboardType="phone-pad"
-                                    value={phone}
-                                    onChangeText={(text) => setPhone(formatPhone(text))}
-                                    maxLength={18}
+                                    secureTextEntry={!showPassword}
+                                    value={password}
+                                    onChangeText={setPassword}
                                     autoCapitalize="none"
                                     autoCorrect={false}
+                                    keyboardType="default"
+                                    contextMenuHidden={true}
                                 />
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    style={styles.eyeButton}
+                                >
+                                    {showPassword ? <EyeClose width={22} height={22} /> : <Eye width={22} height={22} />}
+                                </TouchableOpacity>
                             </View>
-
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Пароль</Text>
-                                <View style={styles.inputWithIcon}>
-                                    <TextInput
-                                        style={styles.input}
-                                        secureTextEntry={!showPassword}
-                                        value={password}
-                                        onChangeText={setPassword}
-                                        autoCapitalize="none"
-                                        autoCorrect={false}
-                                        keyboardType="default"
-                                        contextMenuHidden={true}
-                                    />
-                                    <TouchableOpacity
-                                        onPress={()=> setShowPassword(!showPassword)} style={styles.eyeButton}
-                                    >
-                                        {showPassword ? <EyeClose width={22} height={22}/> : <Eye width={22} height={22} />}
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-                            <TouchableOpacity
-                                style={[
-                                    styles.button,
-                                    (!isPhoneValid || !password) && { opacity: 0.6 },
-                                ]}
-                                disabled={!isPhoneValid || !password}
-                                onPress={handleLogin}>
-                                <Text style={styles.buttonText}>Войти</Text>
-                            </TouchableOpacity>
                         </View>
-                    </>
+
+                        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+                        <TouchableOpacity
+                            style={[
+                                styles.button,
+                                (!isPhoneValid || !password) && { opacity: 0.6 },
+                            ]}
+                            disabled={!isPhoneValid || !password}
+                            onPress={() => handleLogin()}
+                        >
+                            <Text style={styles.buttonText}>Войти</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </KeyboardAvoidingView>
-            <View style={styles.footer}>
 
+            <View style={styles.footer}>
                 <Text style={styles.footerText}>Нет аккаунта? </Text>
-                <TouchableOpacity onPress={handleReg}>
+                <TouchableOpacity onPress={() => handleReg()}>
                     <Text style={styles.registerLink}>Зарегистрироваться</Text>
                 </TouchableOpacity>
             </View>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 16,
         color: '#666666',
-        marginBottom: 48,
+        marginBottom: 36,
     },
     form: {
         width: '100%',
@@ -193,21 +193,13 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily:'Roboto-Bold',
+        fontFamily: 'Roboto-Bold',
     },
     errorText: {
         color: '#FF3B30',
         fontSize: 14,
         marginBottom: 16,
         textAlign: 'center',
-    },
-    forgotPassword: {
-        alignSelf: 'center',
-        marginTop: 16,
-    },
-    linkText: {
-        color: '#4F903F',
-        fontSize: 15,
     },
     footer: {
         position: 'absolute',
@@ -222,7 +214,7 @@ const styles = StyleSheet.create({
     },
     registerLink: {
         color: '#4F903F',
-        fontFamily:'Roboto-Bold',
+        fontFamily: 'Roboto-Bold',
         fontSize: 15,
     },
     inputWithIcon: {

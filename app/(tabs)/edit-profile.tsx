@@ -126,7 +126,7 @@ export default function EditProfile() {
                     <Text style={styles.title}>Редактировать профиль</Text>
 
                     <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Номер телефона*</Text>
+                        <Text style={styles.label}>Номер телефона</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="+7 (___) ___-__-__"
@@ -139,7 +139,7 @@ export default function EditProfile() {
                     </View>
 
                     <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Имя*</Text>
+                        <Text style={styles.label}>Имя</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Иванов Иван Иванович"
@@ -149,39 +149,41 @@ export default function EditProfile() {
                         />
                         {submitted && nameError && <Text style={styles.errorText}>{nameError}</Text>}
                     </View>
-
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Дата рождения</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="гггг-мм-дд"
-                            value={birthDate}
-                            onChangeText={setBirthDate}
-                        />
-                    </View>
-
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Статус занятости</Text>
-                        <View style={styles.pickerWrapper}>
-                            <Picker
-                                selectedValue={employmentStatus}
-                                onValueChange={value => {
-                                    setEmploymentStatus(value);
-                                    setSchool('');
-                                    setCustomSchool('');
-                                    setUniversity('');
-                                    setCustomUniversity('');
-                                    setWorkPlace('');
-                                }}
-                            >
-                                <Picker.Item label="Не выбран" value="" />
-                                <Picker.Item label="Ученик" value="student_school" />
-                                <Picker.Item label="Студент" value="student_university" />
-                                <Picker.Item label="Работаю" value="working" />
-                                <Picker.Item label="Безработный" value="unemployed" />
-                            </Picker>
+                    {currentUser.birthDate && (
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Дата рождения</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="гггг-мм-дд"
+                                value={birthDate}
+                                onChangeText={setBirthDate}
+                            />
                         </View>
-                    </View>
+                    )}
+                    {currentUser.employmentStatus && (
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Статус занятости</Text>
+                            <View style={styles.pickerWrapper}>
+                                <Picker
+                                    selectedValue={employmentStatus}
+                                    onValueChange={value => {
+                                        setEmploymentStatus(value);
+                                        setSchool('');
+                                        setCustomSchool('');
+                                        setUniversity('');
+                                        setCustomUniversity('');
+                                        setWorkPlace('');
+                                    }}
+                                >
+                                    <Picker.Item label="Не выбран" value="" />
+                                    <Picker.Item label="Ученик" value="student_school" />
+                                    <Picker.Item label="Студент" value="student_university" />
+                                    <Picker.Item label="Работаю" value="working" />
+                                    <Picker.Item label="Безработный" value="unemployed" />
+                                </Picker>
+                            </View>
+                        </View>
+                    )}
 
                     {employmentStatus === 'student_school' && (
                         <View style={styles.inputWrapper}>
@@ -238,27 +240,43 @@ export default function EditProfile() {
                         </View>
                     )}
 
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Должность</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Социальный работник"
-                            value={post}
-                            onChangeText={setPost}
-                        />
-                    </View>
+                    {currentUser.post && (
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Должность</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Социальный работник"
+                                value={post}
+                                onChangeText={setPost}
+                            />
+                        </View>
+                    )}
+                    {currentUser.workPlace && currentUser.role ==="coordinator"  && (
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Место работы</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="ООО Ромашка"
+                                value={workPlace}
+                                onChangeText={setWorkPlace}
+                            />
+                        </View>
+                    )}
+
 
                     <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Новый пароль (если хотите сменить)</Text>
+                        <Text style={styles.label}>Новый пароль</Text>
                         <View style={styles.inputWithIcon}>
                             <TextInput
                                 style={styles.input}
                                 secureTextEntry={!showPassword}
                                 value={newPassword}
                                 onChangeText={setNewPassword}
-                                placeholder="Оставьте пустым, если не меняете"
+                                placeholder="****"
                             />
-                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                            <TouchableOpacity
+                                onPress={() => setShowPassword(!showPassword)}
+                                style={styles.eyeButton}>
                                 {showPassword ? <EyeClose width={22} height={22} /> : <Eye width={22} height={22} />}
                             </TouchableOpacity>
                         </View>
@@ -274,7 +292,10 @@ export default function EditProfile() {
                                 value={newPasswordRepeat}
                                 onChangeText={setNewPasswordRepeat}
                             />
-                            <TouchableOpacity onPress={() => setShowPasswordRepeat(!showPasswordRepeat)}>
+                            <TouchableOpacity
+                                onPress={() => setShowPasswordRepeat(!showPasswordRepeat)}
+                                style={styles.eyeButton}
+                            >
                                 {showPasswordRepeat ? <EyeClose width={22} height={22} /> : <Eye width={22} height={22} />}
                             </TouchableOpacity>
                         </View>
@@ -294,12 +315,20 @@ export default function EditProfile() {
 }
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#fff' },
-    container: { flex: 1 },
-    content: { paddingHorizontal: 24, paddingTop: 60, paddingBottom: 40 },
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#fff'
+    },
+    container: {
+        flex: 1
+    },
+    content: {
+        paddingHorizontal: 24,
+        paddingBottom: 40
+    },
     returnBlock: {
         position: 'absolute',
-        top: 40,
+        top: 30,
         left: 20,
         flexDirection: 'row',
         alignItems: 'center',
@@ -312,13 +341,15 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     title: {
+        marginTop: 80,
         fontSize: 28,
         fontFamily: 'Roboto-Bold',
         color: '#333',
         marginBottom: 32,
-        textAlign: 'center',
     },
-    inputWrapper: { marginBottom: 20 },
+    inputWrapper: {
+        marginBottom: 20
+    },
     label: {
         fontSize: 14,
         color: '#333',
@@ -334,8 +365,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         fontSize: 16,
     },
-    inputCustom: { marginTop: 8 },
-    inputWithIcon: { position: 'relative', justifyContent: 'center' },
+    inputCustom: {
+        marginTop: 8
+    },
+    inputWithIcon: {
+        position: 'relative',
+        justifyContent: 'center'
+    },
     eyeButton: {
         position: 'absolute',
         right: 16,
@@ -350,7 +386,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 24,
     },
-    buttonDisabled: { opacity: 0.6 },
+    buttonDisabled: {
+        opacity: 0.6
+    },
     buttonText: {
         color: '#fff',
         fontSize: 16,
